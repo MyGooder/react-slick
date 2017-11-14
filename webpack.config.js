@@ -17,17 +17,25 @@ module.exports = {
   },
   module: {
     loaders: [
-      {test: /\.jsx$/, loaders: ['babel']},
-      {test: /\.js$/, loaders: ['babel'], exclude: /node_modules/},
+      {
+        test: /\.(js|jsx)$/,
+        loaders: ['babel'],
+        exclude: /node_modules/,
+        options: {
+          //babelrc: false,
+          presets: ['babel-preset-react-app', 'babel-preset-env'],
+          compact: true,
+        },
+      },
       {
         test: /\.scss$/,
         loader: 'style!css!sass?outputStyle=expanded&' + 'includePaths[]=' +
-                  (path.resolve(__dirname, './node_modules'))
+        (path.resolve(__dirname, './node_modules'))
       },
       { test: /\.md$/, loader: 'html!markdown' }
     ]
   },
-  postcss: [ autoprefixer({ browsers: ['last 2 version'] }) ],
+  postcss: [autoprefixer({ browsers: ['last 2 version'] })],
   resolve: {
     extensions: ['', '.js', '.jsx']
   },

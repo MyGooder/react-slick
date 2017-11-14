@@ -73,8 +73,8 @@ export var getTrackAnimateCSS = function (spec) {
 export var getTrackLeft = function (spec) {
 
   checkSpecKeys(spec, [
-   'slideIndex', 'trackRef', 'infinite', 'centerMode', 'slideCount', 'slidesToShow',
-   'slidesToScroll', 'slideWidth', 'listWidth', 'variableWidth', 'slideHeight']);
+    'slideIndex', 'trackRef', 'infinite', 'centerMode', 'slideCount', 'slidesToShow',
+    'slidesToScroll', 'slideWidth', 'listWidth', 'variableWidth', 'slideHeight']);
 
   var slideOffset = 0;
   var targetLeft;
@@ -92,21 +92,21 @@ export var getTrackLeft = function (spec) {
     }
     if (spec.slideCount % spec.slidesToScroll !== 0) {
       if (spec.slideIndex + spec.slidesToScroll > spec.slideCount && spec.slideCount > spec.slidesToShow) {
-          if(spec.slideIndex > spec.slideCount) {
-            slideOffset = ((spec.slidesToShow - (spec.slideIndex - spec.slideCount)) * spec.slideWidth) * -1;
-            verticalOffset = ((spec.slidesToShow - (spec.slideIndex - spec.slideCount)) * spec.slideHeight) * -1;
-          } else {
-            slideOffset = ((spec.slideCount % spec.slidesToScroll) * spec.slideWidth) * -1;
-            verticalOffset = ((spec.slideCount % spec.slidesToScroll) * spec.slideHeight) * -1;
-          }
+        if(spec.slideIndex > spec.slideCount) {
+          slideOffset = ((spec.slidesToShow - (spec.slideIndex - spec.slideCount)) * spec.slideWidth) * -1;
+          verticalOffset = ((spec.slidesToShow - (spec.slideIndex - spec.slideCount)) * spec.slideHeight) * -1;
+        } else {
+          slideOffset = ((spec.slideCount % spec.slidesToScroll) * spec.slideWidth) * -1;
+          verticalOffset = ((spec.slideCount % spec.slidesToScroll) * spec.slideHeight) * -1;
+        }
       }
     }
   } else {
 
     if (spec.slideCount % spec.slidesToScroll !== 0) {
       if (spec.slideIndex + spec.slidesToScroll > spec.slideCount && spec.slideCount > spec.slidesToShow) {
-          var slidesToOffset = spec.slidesToShow - (spec.slideCount % spec.slidesToScroll);
-          slideOffset = slidesToOffset * spec.slideWidth;
+        var slidesToOffset = spec.slidesToShow - (spec.slideCount % spec.slidesToScroll);
+        slideOffset = slidesToOffset * spec.slideWidth;
       }
     }
   }
@@ -128,25 +128,25 @@ export var getTrackLeft = function (spec) {
   }
 
   if (spec.variableWidth === true) {
-      var targetSlideIndex;
-      if(spec.slideCount <= spec.slidesToShow || spec.infinite === false) {
-          targetSlide = ReactDOM.findDOMNode(spec.trackRef).childNodes[spec.slideIndex];
+    var targetSlideIndex;
+    if(spec.slideCount <= spec.slidesToShow || spec.infinite === false) {
+      targetSlide = ReactDOM.findDOMNode(spec.trackRef).childNodes[spec.slideIndex];
+    } else {
+      targetSlideIndex = (spec.slideIndex + spec.slidesToShow);
+      targetSlide = ReactDOM.findDOMNode(spec.trackRef).childNodes[targetSlideIndex];
+    }
+    targetLeft = targetSlide ? targetSlide.offsetLeft * -1 : 0;
+    if (spec.centerMode === true) {
+      if(spec.infinite === false) {
+        targetSlide = ReactDOM.findDOMNode(spec.trackRef).children[spec.slideIndex];
       } else {
-          targetSlideIndex = (spec.slideIndex + spec.slidesToShow);
-          targetSlide = ReactDOM.findDOMNode(spec.trackRef).childNodes[targetSlideIndex];
+        targetSlide = ReactDOM.findDOMNode(spec.trackRef).children[(spec.slideIndex + spec.slidesToShow + 1)];
       }
-      targetLeft = targetSlide ? targetSlide.offsetLeft * -1 : 0;
-      if (spec.centerMode === true) {
-          if(spec.infinite === false) {
-              targetSlide = ReactDOM.findDOMNode(spec.trackRef).children[spec.slideIndex];
-          } else {
-              targetSlide = ReactDOM.findDOMNode(spec.trackRef).children[(spec.slideIndex + spec.slidesToShow + 1)];
-          }
 
-          if (targetSlide) {
-            targetLeft = targetSlide.offsetLeft * -1 + (spec.listWidth - targetSlide.offsetWidth) / 2;
-          }
+      if (targetSlide) {
+        targetLeft = targetSlide.offsetLeft * -1 + (spec.listWidth - targetSlide.offsetWidth) / 2;
       }
+    }
   }
 
   return targetLeft;

@@ -1,7 +1,7 @@
 'use strict';
 
 import React from 'react';
-import {InnerSlider} from './inner-slider';
+import InnerSlider from './inner-slider';
 import assign from 'object-assign';
 import json2mq from 'json2mq';
 import defaultProps from './default-props';
