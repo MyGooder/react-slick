@@ -76,7 +76,7 @@ gulp.task('dist-unmin', function (cb) {
 
 
 gulp.task('dist-min', function (cb) {
-  var minConfig = assign({}, distConfig);
+  var minConfig = assign({stats: 'errors-only'}, distConfig);
   minConfig.output.filename = 'react-slick.min.js';
   minConfig.plugins = minConfig.plugins.concat(
     new webpack.optimize.UglifyJsPlugin({

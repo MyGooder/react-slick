@@ -22,7 +22,7 @@ module.exports = {
         loaders: ['babel'],
         exclude: /node_modules/,
         options: {
-          //babelrc: false,
+          babelrc: false,
           presets: ['babel-preset-react-app', 'babel-preset-env'],
           compact: true,
         },
