@@ -1,5 +1,7 @@
 # react-slick
 
+Fork of [react-slick](https://github.com/akiran/react-slick) compatible with React v16
+
 [![Join the chat at https://gitter.im/akiran/react-slick](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/akiran/react-slick?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
 

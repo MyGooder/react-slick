@@ -14,7 +14,6 @@ import helpers from './helpers';
 //import withEventHandlers from './hoc/withEventHandlers'
 import initialState from './initial-state';
 import defaultProps from './default-props';
-import createReactClass from 'create-react-class';
 import classnames from 'classnames';
 import assign from 'object-assign';
 
