@@ -39,8 +39,9 @@ var getSlideStyle = function (spec) {
   }
 
   if (spec.fade) {
+    style.left = typeof spec.slideWidth === 'number' ? -spec.index * spec.slideWidth : 0;
     style.position = 'relative';
-    style.left = -spec.index * spec.slideWidth;
+
     style.opacity = (spec.currentSlide === spec.index) ? 1 : 0;
     style.transition = 'opacity ' + spec.speed + 'ms ' + spec.cssEase;
     style.WebkitTransition = 'opacity ' + spec.speed + 'ms ' + spec.cssEase;

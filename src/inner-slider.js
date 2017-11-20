@@ -968,7 +968,7 @@ class InnerSlider extends Component {
 
 // const sliderWithHelpers = withHelpers(InnerSlider)
 // const sliderWithHandlers = withEventHandlers(sliderWithHelpers)
-//
+
 // export default sliderWithHandlers
 //export default withEventHandlers(withHelpers(InnerSlider))
 export default InnerSlider
