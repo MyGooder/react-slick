@@ -11,3 +11,5 @@ lib
 .idea
 dist
 yarn.lock
+.vscode
+exampleslib

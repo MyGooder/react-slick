@@ -15,8 +15,8 @@ import { PrevArrow, NextArrow } from './arrows';
 
 export var InnerSlider = createReactClass({
   mixins: [HelpersMixin, EventHandlersMixin],
-  list: null,
-  track: null,
+  list: null, // wraps the track
+  track: null, // component that rolls out like a film
   listRefHandler: function (ref) {
     this.list = ref;
   },
@@ -28,20 +28,38 @@ export var InnerSlider = createReactClass({
       currentSlide: this.props.initialSlide
     });
   },
-  getDefaultProps: function () {
-    return defaultProps;
-  },
   componentWillMount: function () {
     if (this.props.init) {
+      if (process.env.NODE_ENV !== 'production') {
+        console.warn('init prop is deprecated and will be removed in next release')
+      }
       this.props.init();
     }
-    this.setState({
-      mounted: true
-    });
-    var lazyLoadedList = [];
-    for (var i = 0; i < React.Children.count(this.props.children); i++) {
-      if (i >= this.state.currentSlide && i < this.state.currentSlide + this.props.slidesToShow) {
+    // this.setState({
+    //   mounted: true
+    // });
+    let lazyLoadedList = [];
+    // number of slides shown in the active frame
+    const slidesToShow = this.props.slidesToShow;
+    const childrenLen = React.Children.count(this.props.children);
+    const currentSlide = this.state.currentSlide;
+    for (let i = 0; i < childrenLen; i++) {
+      // if currentSlide is the lastSlide of current frame and 
+      // rest of the active slides are on the left of currentSlide
+      // then the following might cause a problem
+      if (i >= currentSlide && i < currentSlide + slidesToShow) {
         lazyLoadedList.push(i);
+      }
+    }
+    if (this.props.centerMode === true) {
+      // add slides to show on the left in case of centerMode with lazyLoad
+      let additionalCount = Math.floor(slidesToShow / 2);
+      if (parseInt(this.props.centerPadding) > 0) {
+        additionalCount += 1;
+      }
+      let additionalNum = currentSlide;
+      while(additionalCount--){
+        lazyLoadedList.push((--additionalNum + childrenLen) % childrenLen)
       }
     }
 
@@ -101,6 +119,23 @@ export var InnerSlider = createReactClass({
     }
   },
   componentDidUpdate: function () {
+    if(this.props.lazyLoad && this.props.centerMode) {
+      let childrenLen = React.Children.count(this.props.children)
+      let additionalCount = Math.floor(this.props.slidesToShow / 2)
+      if(parseInt(this.props.centerPadding) > 0) additionalCount++;
+      let leftMostSlide = (this.state.currentSlide - additionalCount + childrenLen) % childrenLen
+      let rightMostSlide = (this.state.currentSlide + additionalCount) % childrenLen
+      if(!this.state.lazyLoadedList.includes(leftMostSlide)){
+        this.setState({
+          lazyLoadedList: this.state.lazyLoadedList + [leftMostSlide]
+        })
+      }
+      if(!this.state.lazyLoadedList.includes(rightMostSlide)){
+        this.setState({
+          lazyLoadedList: this.state.lazyLoadedList + [rightMostSlide]
+        })
+      }
+    }
     this.adaptHeight();
   },
   onWindowResized: function () {
@@ -143,11 +178,15 @@ export var InnerSlider = createReactClass({
       lazyLoadedList: this.state.lazyLoadedList,
       rtl: this.props.rtl,
       slideWidth: this.state.slideWidth,
+      slideHeight: this.state.slideHeight,
+      listHeight: this.state.listHeight,
+      vertical: this.props.vertical,
       slidesToShow: this.props.slidesToShow,
       slidesToScroll: this.props.slidesToScroll,
       slideCount: this.state.slideCount,
       trackStyle: this.state.trackStyle,
-      variableWidth: this.props.variableWidth
+      variableWidth: this.props.variableWidth,
+      unslick: this.props.unslick
     };
 
     var dots;
@@ -161,7 +200,9 @@ export var InnerSlider = createReactClass({
         slidesToScroll: this.props.slidesToScroll,
         clickHandler: this.changeSlide,
         children: this.props.children,
-        customPaging: this.props.customPaging
+        customPaging: this.props.customPaging,
+        infinite: this.props.infinite,
+        appendDots: this.props.appendDots
       };
 
       dots = (<Dots {...dotProps} />);
@@ -210,34 +251,42 @@ export var InnerSlider = createReactClass({
     }
 
     const listStyle = assign({}, verticalHeightStyle, centerPaddingStyle);
+    let listProps = {
+      className: 'slick-list',
+      style: listStyle,
+      onMouseDown: this.swipeStart,
+      onMouseMove: this.state.dragging ? this.swipeMove : null,
+      onMouseUp: this.swipeEnd,
+      onMouseLeave: this.state.dragging ? this.swipeEnd : null,
+      onTouchStart: this.swipeStart,
+      onTouchMove: this.state.dragging ? this.swipeMove : null,
+      onTouchEnd: this.swipeEnd,
+      onTouchCancel: this.state.dragging ? this.swipeEnd : null,
+      onKeyDown: this.props.accessibility ? this.keyHandler : null,
+    }
 
+    let innerSliderProps = {
+      className: className,
+      onMouseEnter: this.onInnerSliderEnter,
+      onMouseLeave: this.onInnerSliderLeave,
+      onMouseOver: this.onInnerSliderOver,
+    }
+
+    if (this.props.unslick) {
+      listProps = { className: 'slick-list' }
+      innerSliderProps = { className }
+    }
+    
     return (
-      <div
-        className={className}
-        onMouseEnter={this.onInnerSliderEnter}
-        onMouseLeave={this.onInnerSliderLeave}
-        onMouseOver={this.onInnerSliderOver}
-      >
-        {prevArrow}
-        <div
-          ref={this.listRefHandler}
-          className="slick-list"
-          style={listStyle}
-          onMouseDown={this.swipeStart}
-          onMouseMove={this.state.dragging ? this.swipeMove : null}
-          onMouseUp={this.swipeEnd}
-          onMouseLeave={this.state.dragging ? this.swipeEnd : null}
-          onTouchStart={this.swipeStart}
-          onTouchMove={this.state.dragging ? this.swipeMove : null}
-          onTouchEnd={this.swipeEnd}
-          onTouchCancel={this.state.dragging ? this.swipeEnd : null}
-          onKeyDown={this.props.accessibility ? this.keyHandler : null}>
+      <div {...innerSliderProps} >
+        { !this.props.unslick ? prevArrow : '' }
+        <div ref={this.listRefHandler} {...listProps} >
           <Track ref={this.trackRefHandler} {...trackProps}>
             {this.props.children}
           </Track>
         </div>
-        {nextArrow}
-        {dots}
+        { !this.props.unslick ? nextArrow: '' }
+        { !this.props.unslick ? dots : '' }
       </div>
     );
   }
